@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Library {
     // мап списки книги. ключ - UserID
@@ -92,9 +93,9 @@ public class Library {
             booksRes.put(id, books.get(id));
         } else {
             for (Book book : books.values()) {
-                if ((title != null && !title.isBlank() && book.getTitle().toUpperCase().matches(".*" + title.toUpperCase() + ".*")) ||
-                        (author != null && !author.isBlank() && book.getAuthor().toUpperCase().matches(".*" + author.toUpperCase() + ".*")) ||
-                        (year != 0 && book.getYear() == year)
+                if (((title != null && !title.isBlank() && book.getTitle().toUpperCase().matches(".*" + title.toUpperCase() + ".*")) || (title == null || title.isBlank())) &&
+                    ((author != null && !author.isBlank() && book.getAuthor().toUpperCase().matches(".*" + author.toUpperCase() + ".*")) || (author == null || author.isBlank())) &&
+                     ((year != 0 && book.getYear() == year) || year == 0)
                 ) {
                     booksRes.put(book.getId(), book);
                 }
@@ -110,8 +111,8 @@ public class Library {
             usersRes.put(id, users.get(id));
         } else {
             for (User user : users.values()) {
-                if ((name != null && !name.isBlank() && user.getName().toUpperCase().matches(".*" + name.toUpperCase() + ".*")) ||
-                        (email != null && !email.isBlank() && user.getEmail().toUpperCase().matches(".*" + email.toUpperCase() + ".*"))
+                if (((name != null && !name.isBlank() && user.getName().toUpperCase().matches(".*" + name.toUpperCase() + ".*")) || (name == null || name.isBlank())) &&
+                        ((email != null && !email.isBlank() && user.getEmail().toUpperCase().matches(".*" + email.toUpperCase() + ".*")) || (email == null || email.isBlank()))
                 ) {
                     usersRes.put(user.getId(), user);
                 }
@@ -129,5 +130,124 @@ public class Library {
                 System.out.printf("Читатель: %s(%d); Книга: %s(%d); Количество книг на руках: %d\n", users.get(entry.getKey()).getName(), entry.getKey(), books.get(bookEntry.getKey()).getTitle(), bookEntry.getKey(), bookEntry.getValue());
             }
         }
+    }
+
+    // метод для ввода в консоли
+    public static String input(String prompt) {
+        System.out.print(prompt);
+        Scanner scanner = new Scanner(System.in);
+        return scanner.nextLine();
+    }
+
+    // добавляет книгу в мап books
+    public static void addBook() {
+        String title, author;
+        int year, totalCopies;
+        try {
+            title = input("введите название книги:");
+            author = input("введите ФИО автора:");
+            year = Integer.parseInt(input("введите год издания:"));
+            totalCopies = Integer.parseInt(input("введите количество копий:"));
+            Library.addBook(title, author, year, totalCopies);
+            System.out.println("Книга добавлена");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // добавляет читателя в мап users
+    public static void addUser() {
+        String name, email;
+        try {
+            name = input("введите ФИО читателя:");
+            email = input("введите адрес эл.почты читателя:");
+            Library.addUser(name, email);
+            System.out.println("Читатель добавлен");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    //вводим значения названия книги, автора, год издания и ищет книгу по комбинации введенных значений
+    public static void findBook() {
+        String title, author;
+        int year;
+        HashMap<Integer, Book> booksFind;
+        try {
+            title = input("введите название книги :");
+            author = input("введите ФИО автора:");
+            try {
+                year = Integer.parseInt(input("введите год издания:"));
+            } catch (Exception e) {
+                year = 0;
+            }
+            booksFind = Library.getBooks(0, title, author, year);
+            Library.displayBooks(booksFind);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    //вводим значения ID читателя и ищет читателя по введенному значению ID
+    public static void findUser() {
+        int id;
+        HashMap<Integer, User> usersFind;
+        try {
+            try {
+                id = Integer.parseInt(input("введите ID читателя:"));
+            } catch (Exception e) {
+                id = 0;
+            }
+            usersFind = Library.getUsers(id, null, null);
+            Library.displayUsers(usersFind);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /*
+      вводим название книги, автора, год издания и ищет книгу по комбинации введенных значений
+      вводим значение ID читателя
+      запускаем метод  book.lendingBook для выдачи книги
+     */
+    public static void lendingBook() {
+        String title, author;
+        int year, userID, lendingCopies = 1;
+        HashMap<Integer, Book> booksFind;
+        try {
+            userID = Integer.parseInt(input("введите ID читателя:"));
+            title = input("введите название книги :");
+            author = input("введите ФИО автора:");
+            try {
+                year = Integer.parseInt(input("введите год издания:"));
+            } catch (Exception e) {
+                year = 0;
+            }
+            booksFind = Library.getBooks(0, title, author, year);
+            if (booksFind.size() == 0 || booksFind.size() > 1) {
+                System.out.println("По вашему запросу не найдено книг или найдено более одной. Уточните параметры поиска");
+                Library.displayBooks(booksFind);
+                return;
+            }
+            for (Book book : booksFind.values()) {
+                book.lendingBook(userID, book.getId(), lendingCopies);
+                return;
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /*
+      вводим значение ID  книги
+      вводим значение ID читателя
+      запускаем метод  book.returnBook для возврата книги
+     */
+    public static void returnBook() {
+        int bookID, userID;
+        userID = Integer.parseInt(input("введите ID читателя:"));
+        bookID = Integer.parseInt(input("введите ID книги:"));
+        Book book = Library.books.get(bookID);
+        book.returnBook(userID, bookID);
     }
 }
