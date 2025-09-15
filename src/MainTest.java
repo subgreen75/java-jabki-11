@@ -62,18 +62,18 @@ class MainTest {
     void testLendingBook()  {
         Library.displayBooks(Library.books);
         System.out.println("выдали книгу 1");
-        Book.lendingBook(1, 1, 1);
+        Library.lendingBook(1, 1, 1);
         System.out.println("еще раз выдали книгу 1");
-        Book.lendingBook(1, 1, 1);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Book.lendingBook(1, 1, 0));
+        Library.lendingBook(1, 1, 1);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Library.lendingBook(1, 1, 0));
         Library.displayLendingBooks();
         System.out.println("вернули книгу 1");
-        Book.returnBook(1,1);
+        Library.returnBook(1,1);
         Library.displayLendingBooks();
         Library.displayBooks(Library.books);
         System.out.println("вернули книгу 1");
-        Book.returnBook(1,1);
+        Library.returnBook(1,1);
         System.out.println("вернули книгу 2 по читателю 2");
-        Book.returnBook(2,2);
+        Library.returnBook(2,2);
     }
 }
