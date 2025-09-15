@@ -112,7 +112,7 @@ public class ConsoleMenu {
             email = input("введите адрес эл.почты читателя:");
             Library.addUser(name, email);
             System.out.println("Читатель добавлен");
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -147,7 +147,7 @@ public class ConsoleMenu {
         try {
             try {
                 id = Integer.parseInt(input("введите ID читателя:"));
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 id = 0;
             }
             if (id == 0) {
@@ -172,14 +172,14 @@ public class ConsoleMenu {
         try {
             try {
                 userID = Integer.parseInt(input("введите ID читателя:"));
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 throw new Exception("Не введено значение id читателя. Поиск прекращен");
             }
             title = input("введите название книги :");
             author = input("введите ФИО автора:");
             try {
                 year = Integer.parseInt(input("введите год издания:"));
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 year = 0;
             }
             if ((title == null || title.isBlank()) && (author == null || author.isBlank()) && year == 0) {
