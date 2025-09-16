@@ -32,20 +32,27 @@ public class Library {
     public static void addBook(String title, String author, int year, int totalCopies) {
         Book book = new Book(title, author, year, totalCopies);
         Boolean existsBookFlag = false;
-        for (Book existsBook : books.values()) {
-            if  (title != null && !title.isBlank() && existsBook.getTitle().toUpperCase().matches(".*" + title.toUpperCase() + ".*")  &&
-                 author != null && !author.isBlank() && existsBook.getAuthor().toUpperCase().matches(".*" + author.toUpperCase() + ".*")  &&
-                    ((year != 0 && existsBook.getYear() == year) )
-            ) {
-                existsBook.setAvailableCopies(existsBook.getAvailableCopies() + totalCopies);
-                existsBook.setTotalCopies(existsBook.getTotalCopies() + totalCopies);
-                books.put(existsBook.getId(), existsBook);
-                existsBookFlag = true;
-            }
-        }
-        if (!existsBookFlag) {
+        HashMap<Integer, Book> findBooks;
+        findBooks = Library.getBooks(0, title, author, year);
+        if (findBooks.size() == 0) {
+            // если не нашли - то добавляем
             books.put(book.getId(), book);
         }
+        //если нашли только одну книгу
+        if (findBooks.size() == 1) {
+            for (Book bookFind : findBooks.values()) {
+                //увеличиваем общее количество и доступное
+                bookFind.setTotalCopies(bookFind.getTotalCopies() + totalCopies);
+                bookFind.setAvailableCopies(bookFind.getAvailableCopies() + totalCopies);
+                //обновляем мап
+                books.put(bookFind.getId(), bookFind);
+            }
+        }
+        //если нашли более одной книги - сообщаем. ничего не делаем
+        if (findBooks.size() > 1) {
+            System.out.printf("В картотеке найдено бюолее одной книги %s, автора %s и годом издания %d. Книга не добавлена. Привидите порядок картотеку",title, author, year);
+        }
+
     }
 
     // метод добавляет книгу в мап users
