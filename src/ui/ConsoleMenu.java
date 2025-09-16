@@ -99,7 +99,7 @@ public class ConsoleMenu {
             System.out.println("Книга добавлена");
         } catch (NumberFormatException e) {
             System.out.println("Не числовые значения года издания или количество копий");
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -115,6 +115,9 @@ public class ConsoleMenu {
         } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
         }
+        catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     //вводим значения названия книги, автора, год издания и ищет книгу по комбинации введенных значений
@@ -122,11 +125,12 @@ public class ConsoleMenu {
         String title, author;
         int year;
         HashMap<Integer, Book> booksFind;
+        System.out.println("Подсказка: поиск может производится по одному или нескольким параметрам. Если поиск по параметру не нужен, просто нажмите ENTER");
         try {
-            title = input("введите название книги :");
-            author = input("введите ФИО автора:");
+            title = input("введите название книги (пропустить - нажмите ENTER):");
+            author = input("введите ФИО автора (пропустить - нажмите ENTER):");
             try {
-                year = Integer.parseInt(input("введите год издания:"));
+                year = Integer.parseInt(input("введите год издания(пропустить - нажмите ENTER):"));
             } catch (Exception e) {
                 year = 0;
             }
@@ -175,10 +179,11 @@ public class ConsoleMenu {
             } catch (NumberFormatException e) {
                 throw new Exception("Не введено значение id читателя. Поиск прекращен");
             }
-            title = input("введите название книги :");
-            author = input("введите ФИО автора:");
+            System.out.println("Подсказка: поиск книги может производится по одному или нескольким параметрам. Если поиск по параметру не нужен, просто нажмите ENTER");
+            title = input("введите название книги (пропустить - нажмите ENTER):");
+            author = input("введите ФИО автора (пропустить - нажмите ENTER):");
             try {
-                year = Integer.parseInt(input("введите год издания:"));
+                year = Integer.parseInt(input("введите год издания (пропустить - нажмите ENTER):"));
             } catch (NumberFormatException e) {
                 year = 0;
             }

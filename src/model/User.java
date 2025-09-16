@@ -1,5 +1,7 @@
 package model;
 
+import java.util.regex.Pattern;
+
 public class User {
     private final int id;
     private String name;
@@ -9,6 +11,12 @@ public class User {
     public User(String name, String email) {
         if (name == null || name.isEmpty() || email == null || email.isEmpty()) {
             throw new IllegalArgumentException("Некорректное значение атрибутов");
+        }
+        if (!Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
+                .matcher(email)
+                .matches()
+        ) {
+            throw new IllegalArgumentException("Некорректное значение email");
         }
         this.id = this.nextId();
         this.name = name;
@@ -32,6 +40,8 @@ public class User {
     }
 
     public void displayUser() {
-        System.out.printf("Читатель: %s (%d), Адрес: %s\n", this.getName(), this.getId(), this.getEmail());
+        System.out.printf("ID: %d, Читатель: %s, Адрес: %s\n", this.getId(), this.getName(),  this.getEmail());
     }
+
+
 }

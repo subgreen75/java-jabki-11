@@ -1,7 +1,7 @@
 package exception;
 
-public class userNotFoundByID extends Exception {
-    public userNotFoundByID(int userID) {
+public class UserNotFoundByID extends Exception {
+    public UserNotFoundByID(int userID) {
         super("Не найден читатель по ID " + userID);
     }
 }

@@ -56,8 +56,12 @@ public class Book {
         this.availableCopies = availableCopies;
     }
 
+    public void setTotalCopies(int totalCopies) {
+        this.totalCopies = totalCopies;
+    }
+
     //выводит в консоль информацию о книге
     public void displayBook() {
-        System.out.printf("Название: %s(%d), Автор: %s, Год издания: %d, Всего копий: %d, В наличии %d\n", this.getTitle(), this.getId(), this.getAuthor(), this.getYear(), this.getTotalCopies(), this.getAvailableCopies());
+        System.out.printf("ID: %d, Название: %s, Автор: %s, Год издания: %d, Всего копий: %d, В наличии %d\n", this.getId(), this.getTitle(), this.getAuthor(), this.getYear(), this.getTotalCopies(), this.getAvailableCopies());
     }
 }

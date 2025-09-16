@@ -1,10 +1,10 @@
 package service;
 
-import exception.bookNotAvailableCopies;
-import exception.bookNotFoundByID;
-import exception.lendingNotFoundByBookID;
-import exception.lendingNotFoundByUserID;
-import exception.userNotFoundByID;
+import exception.BookNotAvailableCopies;
+import exception.BookNotFoundByID;
+import exception.LendingNotFoundByBookID;
+import exception.LendingNotFoundByUserID;
+import exception.UserNotFoundByID;
 import model.Book;
 import model.User;
 
@@ -13,7 +13,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Scanner;
 
 public class Library {
     // мап списки книги. ключ - UserID
@@ -32,13 +31,27 @@ public class Library {
     // метод добавляет книгу в мап books
     public static void addBook(String title, String author, int year, int totalCopies) {
         Book book = new Book(title, author, year, totalCopies);
-        books.put(book.getId(), book);
+        Boolean existsBookFlag = false;
+        for (Book existsBook : books.values()) {
+            if  (title != null && !title.isBlank() && existsBook.getTitle().toUpperCase().matches(".*" + title.toUpperCase() + ".*")  &&
+                 author != null && !author.isBlank() && existsBook.getAuthor().toUpperCase().matches(".*" + author.toUpperCase() + ".*")  &&
+                    ((year != 0 && existsBook.getYear() == year) )
+            ) {
+                existsBook.setAvailableCopies(existsBook.getAvailableCopies() + totalCopies);
+                existsBook.setTotalCopies(existsBook.getTotalCopies() + totalCopies);
+                books.put(existsBook.getId(), existsBook);
+                existsBookFlag = true;
+            }
+        }
+        if (!existsBookFlag) {
+            books.put(book.getId(), book);
+        }
     }
 
     // метод добавляет книгу в мап users
     public static void addUser(String name, String email) {
-        User user = new User(name, email);
-        users.put(user.getId(), user);
+       User user = new User(name, email);
+       users.put(user.getId(), user);
     }
 
     // метод загружает из csv файла в мап books
@@ -143,11 +156,11 @@ public class Library {
         try {
             //проверим есть ли  читатели и книги с такими  userID  и bookID. если нет - выходим
             if (!Library.users.containsKey(userID)) {
-                throw new userNotFoundByID(userID);
+                throw new UserNotFoundByID(userID);
             }
             //если пытаются выдать больше чем есть в наличии - выходим
             if (book.getAvailableCopies() < lendingCopies) {
-                throw new bookNotAvailableCopies(book.getTitle(), book.getAvailableCopies());
+                throw new BookNotAvailableCopies(book.getTitle(), book.getAvailableCopies());
             }
             if (lendingCopies <=0) {
                 throw new IllegalArgumentException("Количество выдачи должно быть больше 0");
@@ -170,10 +183,10 @@ public class Library {
             }
             Library.lendingBooks.put(userID,lendingBookOnUser);
             System.out.printf("Книга %s, выдано %d\n", book.getTitle(), lendingCopies);
-        } catch (bookNotAvailableCopies e) {
+        } catch (BookNotAvailableCopies e) {
             System.out.println(e.getMessage());
         }
-        catch (userNotFoundByID e) {
+        catch (UserNotFoundByID e) {
             System.out.println(e.getMessage());
         }
     }
@@ -183,19 +196,19 @@ public class Library {
         try {
             //проверим есть ли  читатели и книги с такими  userID  и bookID. если нет - выходим
             if (!Library.users.containsKey(userID)) {
-                throw new userNotFoundByID(userID);
+                throw new UserNotFoundByID(userID);
             }
             if (!Library.books.containsKey(bookID)) {
-                throw new bookNotFoundByID(bookID);
+                throw new BookNotFoundByID(bookID);
             }
             //проврим, а есть ли в мапе выданных книг та, которую пытаются вернуть. если нет, выходим
             HashMap<Integer, Integer> lendingBookOnUser;
             if (!Library.lendingBooks.containsKey(userID)) {
-                throw new lendingNotFoundByUserID(userID);
+                throw new LendingNotFoundByUserID(userID);
             }
             lendingBookOnUser = Library.lendingBooks.get(userID);
             if (!lendingBookOnUser.containsKey(bookID)) {
-                throw new lendingNotFoundByBookID(userID, bookID);
+                throw new LendingNotFoundByBookID(userID, bookID);
             }
             //увеливаем доступное кол-во книг в мапе books
             Library.books.get(bookID).setAvailableCopies(Library.books.get(bookID).getAvailableCopies() + lendingBookOnUser.get(bookID));
@@ -208,16 +221,16 @@ public class Library {
                 Library.lendingBooks.put(userID, lendingBookOnUser);
             }
             System.out.printf("Книга %s, вернули\n", Library.books.get(bookID).getTitle());
-        } catch (userNotFoundByID e) {
+        } catch (UserNotFoundByID e) {
             System.out.println(e.getMessage());
         }
-        catch (bookNotFoundByID e) {
+        catch (BookNotFoundByID e) {
             System.out.println(e.getMessage());
         }
-        catch (lendingNotFoundByUserID e) {
+        catch (LendingNotFoundByUserID e) {
             System.out.println(e.getMessage());
         }
-        catch (lendingNotFoundByBookID e) {
+        catch (LendingNotFoundByBookID e) {
             System.out.println(e.getMessage());
         }
     }
