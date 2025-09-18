@@ -8,6 +8,7 @@ import exception.UserNotFoundByID;
 import model.Book;
 import model.User;
 
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -21,6 +22,10 @@ public class Library {
     public static HashMap<Integer, User> users = new HashMap<>();
     // мап списки выданных книг. ключ - UserID, значения - другой мап (ключ - BookID, значение - количество книг на руках)
     public static HashMap<Integer, HashMap<Integer, Integer>> lendingBooks = new HashMap<>();
+    //файл scv книг с исходными данными
+    public static String csvFileBook = "src/service/books.csv";
+    //файл scv книг с исходными данными
+    public static String csvFileUser = "src/service/users.csv";
 
     //метод инициализации начальных значений. загружаем из csv файлов src/service/books.csv и src/service/users.csv
     public static void init() {
@@ -29,7 +34,8 @@ public class Library {
     }
 
     // метод добавляет книгу в мап books
-    public static void addBook(String title, String author, int year, int totalCopies) {
+    // saveToFileFlag - записывать или нет в файл новую книгу. по умолчанию (при загрузке из файле не перезаписываем)
+    public static void addBook(String title, String author, int year, int totalCopies, boolean saveToFileFlag ) {
         Book book = new Book(title, author, year, totalCopies);
         Boolean existsBookFlag = false;
         HashMap<Integer, Book> findBooks;
@@ -37,6 +43,9 @@ public class Library {
         if (findBooks.size() == 0) {
             // если не нашли - то добавляем
             books.put(book.getId(), book);
+            if (saveToFileFlag) {
+                saveBookToFile(book);
+            }
         }
         //если нашли только одну книгу
         if (findBooks.size() == 1) {
@@ -56,21 +65,24 @@ public class Library {
     }
 
     // метод добавляет книгу в мап users
-    public static void addUser(String name, String email) {
+    // saveToFileFlag - записывать или нет в файл новую книгу. по умолчанию (при загрузке из файле не перезаписываем)
+    public static void addUser(String name, String email, boolean saveToFileFlag) {
        User user = new User(name, email);
        users.put(user.getId(), user);
+        if (saveToFileFlag) {
+            saveUserToFile(user);
+        }
     }
 
     // метод загружает из csv файла в мап books
     private static void loadBooksFromFile() {
         books.clear();
-        String csvFile = "src/service/books.csv";
         String line;
         String csvSplitBy = ";";
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFileBook))) {
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(csvSplitBy);
-                addBook(data[0], data[1], Integer.parseInt(data[2]), Integer.parseInt(data[3]));
+                addBook(data[0], data[1], Integer.parseInt(data[2]), Integer.parseInt(data[3]), false);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -80,13 +92,12 @@ public class Library {
     // метод загружает из csv файла в мап users
     private static void loadUsersFromFile() {
         users.clear();
-        String csvFile = "src/service/users.csv";
         String line;
         String csvSplitBy = ";";
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFileUser))) {
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(csvSplitBy);
-                addUser(data[0], data[1]);
+                addUser(data[0], data[1], false);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -239,6 +250,24 @@ public class Library {
         }
         catch (LendingNotFoundByBookID e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    //записывает книгу в файл
+    public static void saveBookToFile(Book book) {
+        try (FileWriter writer = new FileWriter(csvFileBook, true)) {
+            writer.write("\n" + book.getTitle() + ";" + book.getAuthor() + ";" + book.getYear() + ";" + book.getAvailableCopies());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //записывает читателя в файл
+    public static void saveUserToFile(User user) {
+        try (FileWriter writer = new FileWriter(csvFileUser, true)) {
+            writer.write("\n" + user.getName() + ";" + user.getEmail());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

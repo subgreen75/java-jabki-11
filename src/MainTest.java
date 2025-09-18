@@ -16,21 +16,21 @@ class MainTest {
     @Test
     // проверка добавление книги
     void testAddBook() {
-        Library.addBook("Какая то книга", "Какой то автор", 2005, 1);
+        Library.addBook("Какая то книга", "Какой то автор", 2005, 1, false);
         Library.displayBooks(Library.books);
         // добавим с пустым названием
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Library.addBook("", "Какой то автор", 2005, 1));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Library.addBook("Книга 2", "", 2005, 1));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Library.addBook("", "Какой то автор", 2005, 1, false));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Library.addBook("Книга 2", "", 2005, 1, false));
 
     }
 
     //проверка добавления читателя
     @Test
     void testAddUser() {
-        Library.addUser("Читатель1","1@1.ru");
+        Library.addUser("Читатель1","1@1.ru", false);
         // добавим с пустым названием
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Library.addUser("","1@1.ru"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> Library.addUser("Какой то читатель",""));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Library.addUser("","1@1.ru", false));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> Library.addUser("Какой то читатель","", false));
         Library.displayUsers(Library.users);
     }
 

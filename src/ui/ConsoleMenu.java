@@ -95,7 +95,7 @@ public class ConsoleMenu {
             author = input("введите ФИО автора:");
             year = Integer.parseInt(input("введите год издания:"));
             totalCopies = Integer.parseInt(input("введите количество копий:"));
-            Library.addBook(title, author, year, totalCopies);
+            Library.addBook(title, author, year, totalCopies, true);
             System.out.println("Книга добавлена");
         } catch (NumberFormatException e) {
             System.out.println("Не числовые значения года издания или количество копий");
@@ -110,7 +110,7 @@ public class ConsoleMenu {
         try {
             name = input("введите ФИО читателя:");
             email = input("введите адрес эл.почты читателя:");
-            Library.addUser(name, email);
+            Library.addUser(name, email, true);
             System.out.println("Читатель добавлен");
         } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
