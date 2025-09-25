@@ -12,10 +12,7 @@ public class User {
         if (name == null || name.isEmpty() || email == null || email.isEmpty()) {
             throw new IllegalArgumentException("Некорректное значение атрибутов");
         }
-        if (!Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
-                .matcher(email)
-                .matches()
-        ) {
+        if (!validateEmail(email)) {
             throw new IllegalArgumentException("Некорректное значение email");
         }
         this.id = this.nextId();
@@ -41,6 +38,12 @@ public class User {
 
     public void displayUser() {
         System.out.printf("ID: %d, Читатель: %s, Адрес: %s\n", this.getId(), this.getName(),  this.getEmail());
+    }
+
+    private boolean validateEmail(String email) {
+      return Pattern.compile("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
+              .matcher(email)
+              .matches();
     }
 
 

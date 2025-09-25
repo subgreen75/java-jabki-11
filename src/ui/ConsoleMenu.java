@@ -3,9 +3,12 @@ package ui;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import exception.BookNotAvailableCopies;
+import exception.UserNotFoundByID;
 import model.Book;
 import model.User;
 import service.Library;
+import service.LibraryUtils;
 
 import static service.Library.books;
 import static service.Library.users;
@@ -54,11 +57,11 @@ public class ConsoleMenu {
                 break;
             case 3:
                 System.out.println("Вы выбрали Пункт 3. Просмотр всех книг");
-                Library.displayBooks(books);
+                LibraryUtils.displayBooks(books);
                 break;
             case 4:
                 System.out.println("Вы выбрали Пункт 4. Просмотр всех пользователей");
-                Library.displayUsers(users);
+                LibraryUtils.displayUsers(users);
                 break;
             case 5:
                 System.out.println("Вы выбрали Пункт 5. Поиск книг по: названию, автору, году");
@@ -78,7 +81,7 @@ public class ConsoleMenu {
                 break;
             case 9:
                 System.out.println("Вы выбрали Пункт 9. Просмотр всех выданных книг");
-                Library.displayLendingBooks();
+                LibraryUtils.displayLendingBooks();
                 break;
             case 0:
                 break;
@@ -95,7 +98,7 @@ public class ConsoleMenu {
             author = input("введите ФИО автора:");
             year = Integer.parseInt(input("введите год издания:"));
             totalCopies = Integer.parseInt(input("введите количество копий:"));
-            Library.addBook(title, author, year, totalCopies, true);
+            LibraryUtils.addBook(title, author, year, totalCopies, true);
             System.out.println("Книга добавлена");
         } catch (NumberFormatException e) {
             System.out.println("Не числовые значения года издания или количество копий");
@@ -110,7 +113,7 @@ public class ConsoleMenu {
         try {
             name = input("введите ФИО читателя:");
             email = input("введите адрес эл.почты читателя:");
-            Library.addUser(name, email, true);
+            LibraryUtils.addUser(name, email, true);
             System.out.println("Читатель добавлен");
         } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
@@ -137,8 +140,8 @@ public class ConsoleMenu {
             if ((title == null || title.isBlank()) && (author == null || author.isBlank()) && year == 0) {
                 throw new Exception("Не введено ни одного параметра поиска. Уточните хотя бы один параметр поиска");
             }
-            booksFind = Library.getBooks(0, title, author, year);
-            Library.displayBooks(booksFind);
+            booksFind = LibraryUtils.getBooks(0, title, author, year);
+            LibraryUtils.displayBooks(booksFind);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -157,8 +160,8 @@ public class ConsoleMenu {
             if (id == 0) {
                 throw new Exception("Не введено значение id читателя. Поиск прекращен");
             }
-            usersFind = Library.getUsers(id, null, null);
-            Library.displayUsers(usersFind);
+            usersFind = LibraryUtils.getUsers(id, null, null);
+            LibraryUtils.displayUsers(usersFind);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -190,14 +193,23 @@ public class ConsoleMenu {
             if ((title == null || title.isBlank()) && (author == null || author.isBlank()) && year == 0) {
                 throw new Exception("Не введено ни одного параметра поиска. Уточните хотя бы один параметр поиска");
             }
-            booksFind = Library.getBooks(0, title, author, year);
+            booksFind = LibraryUtils.getBooks(0, title, author, year);
             if (booksFind.size() == 0 || booksFind.size() > 1) {
                 System.out.println("По вашему запросу не найдено книг или найдено более одной. Уточните параметры поиска");
-                Library.displayBooks(booksFind);
+                LibraryUtils.displayBooks(booksFind);
                 return;
             }
             for (Book book : booksFind.values()) {
-                Library.lendingBook(userID, book.getId(), lendingCopies);
+                try {
+                    LibraryUtils.lendingBook(userID, book.getId(), lendingCopies);
+                }
+                catch (BookNotAvailableCopies e) {
+                    System.out.println(e.getMessage());
+                }
+                catch (UserNotFoundByID e) {
+                    System.out.println(e.getMessage());
+                }
+
                 return;
             }
         } catch (Exception e) {
@@ -215,7 +227,7 @@ public class ConsoleMenu {
         try {
             userID = Integer.parseInt(input("введите ID читателя:"));
             bookID = Integer.parseInt(input("введите ID книги:"));
-            Library.returnBook(userID, bookID);
+            LibraryUtils.returnBook(userID, bookID);
         } catch (NumberFormatException e) {
             System.out.println("Введите ID читателя и ID книги. Поиск прекращен");
         }
